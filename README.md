@@ -19,12 +19,7 @@ This implementation has a configuration file, [event_configuration.h](src/main/c
 
 # Usage
 
-1. Install `src` and `inc` directories in your Board Support Package. They can be automatically downloaded using the following command lines:
-
-   ```sh
-    svn export --force https://github.com/MicroEJ/AbstractionLayer-Event-Queue-ThreadX/trunk/inc [path_to_bsp_directory]    
-    svn export --force https://github.com/MicroEJ/AbstractionLayer-Event-Queue-ThreadX/trunk/src [path_to_bsp_directory]
-   ```
+1. These sources can be included in the VEE Port with the method you prefer, by using this repository as a submodule or by doing a copy of the sources in the VEE Port repository.
 
 2. The configuration file `event_configuration.h` allows to set the Event Queue size with the macro `EVENT_QUEUE_SIZE`. The value configured by default is 100, adapt the value to your needs.
 
@@ -43,7 +38,7 @@ Here is a non exhaustive list of tested environments:
 - Compilers / development environments:
   - IAR Embedded Workbench 9.30.1
   - IAR Embedded Workbench 9.50.1
-- ThreadX / Azure RTOS versions:
+- ThreadX RTOS versions:
   - 6.1
   - 6.2
 
@@ -66,7 +61,7 @@ It has been verified with Cppcheck v2.13. Here is the list of deviations from MI
 # Dependencies
 
 - MicroEJ Architecture `7.x` or higher.
-- Azure RTOS ThreadX `6.1` or higher
+- ThreadX RTOS `6.1` or higher.
 
 # Source
 

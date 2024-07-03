@@ -16,7 +16,7 @@ extern "C" {
  * @file
  * @brief LLEVENT configuration file for ThreadX implementation.
  * @author MicroEJ Developer Team
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 
