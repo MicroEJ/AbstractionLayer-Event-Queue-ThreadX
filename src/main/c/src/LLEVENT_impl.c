@@ -1,7 +1,7 @@
 /*
  * C
  *
- * Copyright 2023-2024 MicroEJ Corp. All rights reserved.
+ * Copyright 2023-2025 MicroEJ Corp. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be found with this software.
  */
 
@@ -9,7 +9,7 @@
  * @file
  * @brief LLEVENT implementation over ThreadX.
  * @author MicroEJ Developer Team
- * @version 1.0.1
+ * @version 1.1.1
  */
 
 // -----------------------------------------------------------------------------
@@ -17,6 +17,7 @@
 // -----------------------------------------------------------------------------
 
 #include "LLEVENT_impl.h"
+#include "event_helper.h"
 #include "event_configuration.h"
 #include <stdlib.h>
 #include <string.h>
@@ -52,16 +53,16 @@ extern "C" {
 static TX_QUEUE event_queue = { 0 };
 // cppcheck-suppress [misra-c2012-8.9]: Threadx RTOS requires to allocate ThreadX structures and variables in global
 // access, not in the stack.
-static CHAR* event_queue_name = "MICROEJ Event Queue";
+static CHAR *event_queue_name = "MICROEJ Event Queue";
 // cppcheck-suppress [misra-c2012-8.9]: Threadx RTOS requires to allocate ThreadX structures and variables in global
 // access, not in the stack.
-static uint32_t queue_stack[EVENT_QUEUE_SIZE] = { 0 };
+static uint32_t queue_stack[LLEVENT_QUEUE_SIZE] = { 0 };
 
 // Initialize the mutex used when sending data into event_queue.
 static TX_MUTEX mutex_send_event = { 0 };
 // cppcheck-suppress [misra-c2012-8.9]: Threadx RTOS requires to allocate ThreadX structures and variables in global
 // access, not in the stack.
-static CHAR* mutex_queue_name = "Event Queue Mutex";
+static CHAR *mutex_queue_name = "Event Queue Mutex";
 
 static int32_t waiting_receive_java_thread_id = SNI_ERROR;
 
@@ -109,7 +110,7 @@ static uint8_t data_alignment;
  */
 void LLEVENT_IMPL_initialize(void) {
 	// the size of messages is in 32-bit words, so 1 here.
-	UINT queue_status = tx_queue_create(&event_queue, event_queue_name, 1, &queue_stack[0], EVENT_QUEUE_SIZE);
+	UINT queue_status = tx_queue_create(&event_queue, event_queue_name, 1, &queue_stack[0], LLEVENT_QUEUE_SIZE);
 	UINT mutex_status = tx_mutex_create(&mutex_send_event, mutex_queue_name, TX_NO_INHERIT);
 	if ((TX_SUCCESS != queue_status) || (TX_SUCCESS != mutex_status)) {
 		if (SNI_throwNativeIOException(EVENT_NOK, "Not enough memory to allocate the queue.") == SNI_ERROR) {
@@ -185,7 +186,7 @@ bool LLEVENT_IMPL_offer_event(uint32_t type, uint32_t data) {
  * @param data the data of the event.
  * @return true if the message has been sent, false otherwise.
  */
-bool LLEVENT_IMPL_offer_extended_event(uint32_t type, const void* data, uint32_t data_length) {
+bool LLEVENT_IMPL_offer_extended_event(uint32_t type, const void *data, uint32_t data_length) {
 	// The boolean to return at the end of the method.
 	jboolean offer_status = JTRUE;
 	// Create the first uint32_t of the extended event that contain the type and the data length (number of bytes).
@@ -194,7 +195,7 @@ bool LLEVENT_IMPL_offer_extended_event(uint32_t type, const void* data, uint32_t
 	// Convert the data.
 	// cppcheck-suppress [misra-c2012-11.5]: conversion from void* to int32_t* necessary to send the input data through
 	// the queue.
-	const int32_t* event_data = (const int32_t*)data;
+	const int32_t *event_data = (const int32_t *)data;
 
 	// Get the number of data messages to send in the event queue -> Number of bytes / sizeof(int) rounded up.
 	int data_length_int = (int)ceil((double)(data_length / (double)sizeof(int)));
@@ -230,7 +231,7 @@ bool LLEVENT_IMPL_offer_extended_event(uint32_t type, const void* data, uint32_t
 		for (int i = 0; i < data_length_int; i++) {
 			// cppcheck-suppress [misra-c2012-11.8]: The ThreadX API prevents the use of the const keyword for the
 			// pointer type cast.
-			status = tx_queue_send(&event_queue, (void*)&event_data[i], TX_NO_WAIT);
+			status = tx_queue_send(&event_queue, (void *)&event_data[i], TX_NO_WAIT);
 			if (TX_SUCCESS != status) {
 				LLEVENT_ERROR_TRACE("during tx_queue_send ; status = 0x%x \n", status);
 				offer_status = JFALSE;
@@ -384,7 +385,7 @@ jfloat LLEVENT_IMPL_read_float(void) {
  * Reads len bytes of data from the event queue and store it into the buffer at the offset off.
  * Throws IOException if there are not enough bytes available or if the buffer is too small.
  */
-jint LLEVENT_IMPL_read(uint8_t* b, uint32_t off, uint32_t len) {
+jint LLEVENT_IMPL_read(uint8_t *b, uint32_t off, uint32_t len) {
 	// Status of the method.
 	jboolean read_status = JTRUE;
 
@@ -563,7 +564,7 @@ jbyte read_one_byte(void) {
 			// Get the next byte of data from the static buffer.
 			// IAR does not allow direct conversion from uint32_t* into int_to_byte_t*, intermediate data required.
 			struct int_to_byte_t int_to_byte_data;
-			struct int_to_byte_t* int_to_byte_ptr = &int_to_byte_data;
+			struct int_to_byte_t *int_to_byte_ptr = &int_to_byte_data;
 			int_to_byte_ptr->first_byte = (buffer_extended_data & BYTE_ONE_MASK);
 			int_to_byte_ptr->second_byte = (((buffer_extended_data & BYTE_TWO_MASK) >> BYTE_TWO_SHIFT));
 			int_to_byte_ptr->third_byte = (((buffer_extended_data & BYTE_THREE_MASK) >> BYTE_THREE_SHIFT));
@@ -647,7 +648,7 @@ jshort read_two_bytes(void) {
 			// Get the two next bytes of data from the static buffer.
 			// IAR does not allow direct conversion from uint32_t* into int_to_short_t*, intermediate data required.
 			struct int_to_short_t int_to_short_data;
-			struct int_to_short_t* int_to_short_ptr = &int_to_short_data;
+			struct int_to_short_t *int_to_short_ptr = &int_to_short_data;
 
 			int_to_short_ptr->first_short = (buffer_extended_data & SHORT_ONE_MASK);
 			int_to_short_ptr->second_short = (((buffer_extended_data & SHORT_TWO_MASK)) >> SHORT_TWO_SHIFT);

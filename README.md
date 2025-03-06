@@ -1,8 +1,8 @@
 <!--
 	Markdown
 -->
-![SDK](https://shields.microej.com/endpoint?url=https://repository.microej.com/packages/badges/sdk_5.8.json)
-![ARCH](https://shields.microej.com/endpoint?url=https://repository.microej.com/packages/badges/arch_7.18.json)
+![SDK](https://shields.microej.com/endpoint?url=https://repository.microej.com/packages/badges/sdk_6.0.json)
+![ARCH](https://shields.microej.com/endpoint?url=https://repository.microej.com/packages/badges/arch_8.3.json)
 
 # Overview
 
@@ -21,7 +21,9 @@ This implementation has a configuration file, [event_configuration.h](src/main/c
 
 1. These sources can be included in the VEE Port with the method you prefer, by using this repository as a submodule or by doing a copy of the sources in the VEE Port repository.
 
-2. The configuration file `event_configuration.h` allows to set the Event Queue size with the macro `EVENT_QUEUE_SIZE`. The value configured by default is 100, adapt the value to your needs.
+2. The configuration file `event_configuration.h` stores default values of the abstraction layer configuration. The Event Queue size with the macro `LLEVENT_QUEUE_SIZE` with a default of 100.
+   If you want to update a configuration please edit or create the file `veeport_configuration.h` and set the desired value. This setting overwrites the content of `event_configuration.h`.
+   If your VEE Port does not print logs using printf, the trace redirection macro `LLEVENT_ERROR_TRACE` can be updated in `veeport_configuration.h`.
 
 # Requirements
 
@@ -57,6 +59,8 @@ It has been verified with Cppcheck v2.13. Here is the list of deviations from MI
 |  Rule 11.8 |  Required | The ThreadX API prevents the use of the const keyword for the pointer type cast.                                |
 |  Rule 18.4 |  Advisory | From sni.h with SNI_getArrayLength, used for configurable C library.                                            |
 |  Rule 19.2 |  Required | The union keyword here is useful to parse the data structure.                                                   |
+|  Rule 21.6 |  Required | The Standard Library input/output is only used for debug purpose by default.                                    |
+
 
 # Dependencies
 
@@ -72,5 +76,5 @@ N/A
 The current version of this Event Queue port does not support sending events from an interrupt.
 
 ---
-_Copyright 2024 MicroEJ Corp. All rights reserved._
+_Copyright 2024-2025 MicroEJ Corp. All rights reserved._
 _Use of this source code is governed by a BSD-style license that can be found with this software._

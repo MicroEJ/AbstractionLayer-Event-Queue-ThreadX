@@ -1,7 +1,7 @@
 /*
  * C
  *
- * Copyright 2023-2024 MicroEJ Corp. All rights reserved.
+ * Copyright 2023-2025 MicroEJ Corp. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be found with this software.
  */
 
@@ -9,7 +9,7 @@
  * @file
  * @brief LLEVENT implementation over ThreadX.
  * @author MicroEJ Developer Team
- * @version 1.0.1
+ * @version 1.1.1
  */
 
 #include "LLEVENT.h"
@@ -32,7 +32,8 @@ extern "C" {
 
 int32_t LLEVENT_offerEvent(int32_t type, int32_t data) {
 	// Check the validity of the arguments.
-	bool check_parameters = (type >= (int32_t)0) && (type < (int32_t)MAX_TYPE_ID) && ((data & (int32_t)DATA_LENGTH_MASK) == data);
+	bool check_parameters = (type >= (int32_t)0) && (type < (int32_t)MAX_TYPE_ID) &&
+	                        ((data & (int32_t)DATA_LENGTH_MASK) == data);
 
 	bool event_sent = false;
 
@@ -54,9 +55,10 @@ int32_t LLEVENT_offerEvent(int32_t type, int32_t data) {
 	return status;
 }
 
-int32_t LLEVENT_offerExtendedEvent(int32_t type, void* data, int32_t data_length) {
+int32_t LLEVENT_offerExtendedEvent(int32_t type, void *data, int32_t data_length) {
 	//Check the validity of the arguments.
-	bool check_parameters = (type >= (int32_t)0) && (type < (int32_t)MAX_TYPE_ID) && ((data_length & (int32_t)DATA_LENGTH_MASK) == data_length);
+	bool check_parameters = (type >= (int32_t)0) && (type < (int32_t)MAX_TYPE_ID) &&
+	                        ((data_length & (int32_t)DATA_LENGTH_MASK) == data_length);
 
 	bool event_sent = false;
 
